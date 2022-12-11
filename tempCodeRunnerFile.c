@@ -1,0 +1,1 @@
+void clear(), sort(char **, int), generateList(int, int, char **, char[][]), displayList(int, int, char[][b + 1]);
