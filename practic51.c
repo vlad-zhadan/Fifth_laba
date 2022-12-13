@@ -2,10 +2,11 @@
 #include <string.h>
 #include <conio.h>
 #include <stdlib.h> // system("cls");
+#include <time.h>
 
 #define ESC 27
 
-int verify_int(int *), random(int, int), var_str_size, b;
+int verify_int(int *), random(int, int), var_str_size, b, cmpfunc(const void *, const void *), verify_choise_case(int);
 void clear(), sort(char **, int), generateList(int, int, char **, char[][var_str_size + 1]), displayList(int, int, char[][b + 1]);
 
 int main()
@@ -17,15 +18,15 @@ int main()
         key = getch();
         if (key != ESC)
         {
-            int n_size, str_size;
+            int n_size, str_size, choise_case;
 
             do
             {
-                printf("\nNumber of elements:\n");
+                printf("\nNumber of elements: ");
             } while ((verify_int(&n_size) == 1));
             do
             {
-                printf("Size of each string:\n");
+                printf("Size of each string: ");
             } while ((verify_int(&str_size) == 1));
 
             char list[n_size][str_size + 1];
@@ -34,14 +35,39 @@ int main()
             printf("\nGenerated list: \n\n");
             generateList(n_size, str_size, addr, list);
             displayList(n_size, str_size, list);
-            sort(addr, n_size);
 
-            getch();
+            do
+            {
+                printf("Choose the way of sorting array, 1 for quicksort or 2 for bubble sort: ");
+            } while ((verify_int(&choise_case) == 1) || (verify_choise_case(choise_case) == 1));
 
-            printf("\nSorted list: \n\n");
+            clock_t t;
+            t = clock();
+            if (choise_case == 1)
+            {
+                qsort(addr, n_size, sizeof(int), cmpfunc);
+            }
+            else
+            {
+                sort(addr, n_size);
+            }
+            t = clock() - t;
+            double time_taken = ((double)t) / CLOCKS_PER_SEC;
+
+            printf("\nSorted list in %.50f: \n\n", time_taken);
             displayList(n_size, str_size, list);
         }
     } while (key != ESC);
+}
+
+int verify_choise_case(int var_choise_case)
+{
+    if ((var_choise_case == 1) || (var_choise_case == 2))
+    {
+        return 0;
+    }
+    printf("Invalid choise of case. Try again!\n");
+    return 1;
 }
 
 void generateList(int var_n_str, int var_str_size, char **pointer_to_arr, char (*array)[var_str_size + 1])
@@ -79,6 +105,11 @@ void displayList(int a, int b, char array[][b + 1])
     }
 }
 
+int cmpfunc(const void *a, const void *b)
+{
+    return (*(int *)a - *(int *)b);
+}
+
 void sort(char **pointers, int size)
 {
     for (short i = 0; i < size - 1; i++)
@@ -87,7 +118,7 @@ void sort(char **pointers, int size)
         {
             if (strcmp(pointers[i], pointers[j]) > 0)
             {
-                char temp[strlen(pointers[j]) + 1];
+                char temp[strlen(pointers[j])];
                 strcpy(temp, pointers[j]);
                 strcpy(pointers[j], pointers[i]);
                 strcpy(pointers[i], temp);
